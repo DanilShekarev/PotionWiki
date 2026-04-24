@@ -1,16 +1,16 @@
 .editor-actions {
     display: flex;
-    gap: 2rem;
-    align-items: flex-end;
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
 }
 
 .file-actions {
     display: flex;
-    gap: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .potion-list-section {
@@ -20,7 +20,7 @@
 }
 
 .potion-list-section label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-light);
 }
 
@@ -30,11 +30,11 @@
     border-radius: 6px;
     font-size: 1rem;
     background: var(--bg-card);
-    min-width: 200px;
+    width: 100%;
 }
 
 .editor-form {
-    max-width: 700px;
+    max-width: 100%;
 }
 
 .form-group {
@@ -70,12 +70,14 @@
 }
 
 .btn {
-    padding: 0.75rem 1.25rem;
+    padding: 0.75rem 1rem;
     border: none;
     border-radius: 6px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s;
+    flex: 1;
+    min-width: 100px;
 }
 
 .btn-primary {
@@ -98,7 +100,91 @@
 }
 
 .form-actions {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.image-upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-upload-area:hover {
+    border-color: var(--accent);
+    background: var(--bg);
+}
+
+.image-upload-area.dragover {
+    border-color: var(--accent);
+    background: var(--bg);
+}
+
+.image-upload-placeholder {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    padding: 0.5rem;
+}
+
+.image-upload-area img {
+    max-width: 100%;
+    max-height: 180px;
+    border-radius: 6px;
+}
+
+.back-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+}
+
+.back-link:hover {
+    color: var(--text);
+    background: var(--bg);
+}
+
+@media (min-width: 480px) {
+    .editor-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .potion-list-section select {
+        min-width: 180px;
+        width: auto;
+    }
+
+    .form-actions {
+        flex-direction: row;
+    }
+}
+
+@media (min-width: 768px) {
+    .editor-form {
+        max-width: 700px;
+    }
+
+    .editor-actions {
+        gap: 2rem;
+        flex-wrap: nowrap;
+    }
+
+    .form-actions {
+        flex-wrap: nowrap;
+    }
 }

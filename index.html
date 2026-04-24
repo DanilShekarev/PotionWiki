@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4a4a48">
+    <meta name="description" content="Коллекция зелий для D&D">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <title>PotionWiki - Зелья D&D</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,10 +24,27 @@
 
     <main>
         <section class="filters">
-            <input type="text" id="search" placeholder="Поиск по названию...">
-            <select id="propertyFilter">
-                <option value="">Все свойства</option>
-            </select>
+            <input type="text" id="search" placeholder="Поиск...">
+            <div class="filter-group">
+                <label>Свойства</label>
+                <div class="multiselect" id="propertyMultiselect">
+                    <button type="button" class="multiselect-toggle" id="propertyToggle">
+                        <span id="propertyLabel">Все свойства</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="multiselect-dropdown" id="propertyDropdown"></div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Теги</label>
+                <div class="multiselect" id="tagMultiselect">
+                    <button type="button" class="multiselect-toggle" id="tagToggle">
+                        <span id="tagLabel">Все теги</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="multiselect-dropdown" id="tagDropdown"></div>
+                </div>
+            </div>
         </section>
 
         <section id="potionsList" class="potions-grid">
@@ -30,6 +54,7 @@
     <div id="potionModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
+            <button id="editPotionBtn" class="modal-edit-btn">✏️ Редактировать</button>
             <div class="modal-body">
                 <div class="modal-image">
                     <img id="modalImage" src="" alt="">
