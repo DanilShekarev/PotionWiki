@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор зелий - PotionWiki</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+    <header>
+        <h1>PotionWiki</h1>
+        <nav>
+            <a href="index.html">Зелья</a>
+            <a href="editor.html" class="active">Редактор</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="editor-actions">
+            <div class="file-actions">
+                <button id="loadJsonBtn" class="btn btn-secondary">Загрузить JSON</button>
+                <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+                <button id="saveJsonBtn" class="btn btn-primary">Скачать JSON</button>
+            </div>
+            <div class="potion-list-section">
+                <label>или выберите существующее:</label>
+                <select id="existingPotions">
+                    <option value="">-- Новое зелье --</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="editor-form">
+            <div class="form-group">
+                <label for="potionId">ID (имя файла)</label>
+                <input type="text" id="potionId" placeholder="potion-id">
+            </div>
+
+            <div class="form-group">
+                <label for="potionName">Название</label>
+                <input type="text" id="potionName" placeholder="Название зелья">
+            </div>
+
+            <div class="form-group">
+                <label for="potionDescription">Описание</label>
+                <textarea id="potionDescription" rows="3" placeholder="Основное описание"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="potionAdditional">Дополнительное описание</label>
+                <textarea id="potionAdditional" rows="3" placeholder="Дополнительное описание"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="potionImage">Путь к изображению</label>
+                <input type="text" id="potionImage" placeholder="images/potion-id.png">
+            </div>
+
+            <div class="form-group">
+                <label>Теги (через запятую)</label>
+                <input type="text" id="potionTags" placeholder="лечебное, редкое, магическое">
+            </div>
+
+            <div class="form-group">
+                <label>Свойства (по одному на строку)</label>
+                <textarea id="potionProperties" rows="4" placeholder="Восстанавливает 2d4+2 HP&#10;Не требует проверки"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Состав (по одному на строку)</label>
+                <textarea id="potionIngredients" rows="4" placeholder="Целебная трава&#10;Очищенная вода"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button id="clearBtn" class="btn btn-secondary">Очистить</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="editor.js"></script>
+</body>
+</html>

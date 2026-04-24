@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PotionWiki - Зелья D&D</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>PotionWiki</h1>
+        <nav>
+            <a href="index.html" class="active">Зелья</a>
+            <a href="editor.html">Редактор</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="filters">
+            <input type="text" id="search" placeholder="Поиск по названию...">
+            <select id="propertyFilter">
+                <option value="">Все свойства</option>
+            </select>
+        </section>
+
+        <section id="potionsList" class="potions-grid">
+        </section>
+    </main>
+
+    <div id="potionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body">
+                <div class="modal-image">
+                    <img id="modalImage" src="" alt="">
+                </div>
+                <div class="modal-info">
+                    <h2 id="modalName"></h2>
+                    <p id="modalDescription"></p>
+                    <div class="modal-tags" id="modalTags"></div>
+                    <div class="modal-section">
+                        <h3>Свойства</h3>
+                        <ul id="modalProperties"></ul>
+                    </div>
+                    <div class="modal-section">
+                        <h3>Состав</h3>
+                        <ul id="modalIngredients"></ul>
+                    </div>
+                    <div class="modal-section">
+                        <h3>Дополнительно</h3>
+                        <p id="modalAdditional"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
