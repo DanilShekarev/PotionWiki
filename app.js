@@ -1,16 +1,12 @@
-const IMAGE_STORAGE_PREFIX = 'potionwiki_image_';
-
-function loadPotionImage(id) {
-    return localStorage.getItem(IMAGE_STORAGE_PREFIX + id) || null;
-}
-
 const DEFAULT_POTIONS = [
   {
     id: "zelie-isceleniya",
     name: "Зелье исцеления",
     description: "Базовая версия лечебного зелья. Восстанавливает небольшое количество здоровья.",
     additionalDescription: "Имеет приятный розовый цвет и сладковатый вкус. Популярно среди искателей приключений любого уровня.",
+    image: "",
     tags: ["лечебное", "базовое", "обычное"],
+    habitat: ["город", "подземелье"],
     properties: ["Восстанавливает 2d4+2 HP", "Не требует проверки"],
     ingredients: ["Целебная трава", "Очищенная вода", "Капля эликсира"]
   },
@@ -19,7 +15,9 @@ const DEFAULT_POTIONS = [
     name: "Зелье невидимости",
     description: "Делает выпившего невидимым для глаз и магических способностей обнаружения.",
     additionalDescription: "Прозрачная жидкость с лёгким мерцанием. Эффект исчезает сразу после атаки или использования заклинания.",
+    image: "",
     tags: ["магическое", "редкое"],
+    habitat: ["подземелье"],
     properties: ["Невидимость 1d4+4 часа", "Исчезает после атаки", "Скрывает от обнаружения"],
     ingredients: ["Слеза призрака", "Эфирное крыло", "Аманитовый гриб"]
   },
@@ -28,7 +26,9 @@ const DEFAULT_POTIONS = [
     name: "Зелье великой силы",
     description: "Увеличивает физическую силу выпившего до сверхчеловеческого уровня.",
     additionalDescription: "Ярко-красная густая жидкость. Придаёт ощущение невероятной мощи, но быстрое истощение мышц может быть опасным.",
+    image: "",
     tags: ["усиление", "редкое", "магическое"],
+    habitat: ["город", "лес"],
     properties: ["+5 к проверкам Силы", "Может сломать оружие при критической силе", "Длится 1 час"],
     ingredients: ["Сок титана", "Кость великана", "Железный корень"]
   }
@@ -37,8 +37,10 @@ const DEFAULT_POTIONS = [
 let allPotions = [];
 let allProperties = new Set();
 let allTags = new Set();
+let allHabitats = new Set();
 let selectedProperties = [];
 let selectedTags = [];
+let selectedHabitats = [];
 
 async function loadPotions() {
     try {
@@ -51,9 +53,11 @@ async function loadPotions() {
         }
         extractProperties();
         extractTags();
+        extractHabitats();
         renderPotions(allPotions);
         populatePropertyDropdown();
         populateTagDropdown();
+        populateHabitatDropdown();
     } catch (error) {
         console.error('Error loading potions:', error);
         document.getElementById('potionsList').innerHTML = '<p>Ошибка загрузки зелий</p>';
@@ -78,9 +82,17 @@ function extractTags() {
     });
 }
 
+function extractHabitats() {
+    allHabitats.clear();
+    allPotions.forEach(potion => {
+        if (potion.habitat) {
+            potion.habitat.forEach(h => allHabitats.add(h));
+        }
+    });
+}
+
 function populatePropertyDropdown() {
     const dropdown = document.getElementById('propertyDropdown');
-    const label = document.getElementById('propertyLabel');
     const options = Array.from(allProperties).sort();
     dropdown.innerHTML = options.map(prop => `
         <label class="multiselect-option">
@@ -94,7 +106,6 @@ function populatePropertyDropdown() {
 
 function populateTagDropdown() {
     const dropdown = document.getElementById('tagDropdown');
-    const label = document.getElementById('tagLabel');
     const options = Array.from(allTags).sort();
     dropdown.innerHTML = options.map(tag => `
         <label class="multiselect-option">
@@ -104,6 +115,19 @@ function populateTagDropdown() {
     `).join('');
 
     updateTagLabel();
+}
+
+function populateHabitatDropdown() {
+    const dropdown = document.getElementById('habitatDropdown');
+    const options = Array.from(allHabitats).sort();
+    dropdown.innerHTML = options.map(habitat => `
+        <label class="multiselect-option">
+            <input type="checkbox" value="${habitat}" ${selectedHabitats.includes(habitat) ? 'checked' : ''}>
+            ${habitat}
+        </label>
+    `).join('');
+
+    updateHabitatLabel();
 }
 
 function updatePropertyLabel() {
@@ -128,6 +152,17 @@ function updateTagLabel() {
     }
 }
 
+function updateHabitatLabel() {
+    const label = document.getElementById('habitatLabel');
+    if (selectedHabitats.length === 0) {
+        label.textContent = 'Все обитания';
+    } else if (selectedHabitats.length === 1) {
+        label.textContent = selectedHabitats[0];
+    } else {
+        label.textContent = `Выбрано: ${selectedHabitats.length}`;
+    }
+}
+
 function renderPotions(potions) {
     const grid = document.getElementById('potionsList');
     grid.innerHTML = '';
@@ -142,11 +177,11 @@ function renderPotions(potions) {
         card.className = 'potion-card';
         card.onclick = () => openModal(potion);
 
-        const image = loadPotionImage(potion.id);
+        const image = potion.image || '';
         const tagsHtml = potion.tags ? potion.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : '';
 
         card.innerHTML = `
-            ${image ? `<img class="potion-card-image" src="${image}" alt="${potion.name}">` : '<div class="potion-card-placeholder">🧪</div>'}
+            ${image ? `<img class="potion-card-image" src="${image}" alt="${potion.name}" onerror="this.style.display='none'">` : '<div class="potion-card-placeholder">🧪</div>'}
             <h3>${potion.name}</h3>
             <p>${potion.description || ''}</p>
             <div class="potion-card-tags">${tagsHtml}</div>
@@ -178,15 +213,20 @@ function filterPotions() {
         );
     }
 
+    if (selectedHabitats.length > 0) {
+        filtered = filtered.filter(potion =>
+            potion.habitat && selectedHabitats.some(h => potion.habitat.includes(h))
+        );
+    }
+
     renderPotions(filtered);
 }
 
 function openModal(potion) {
     const modal = document.getElementById('potionModal');
-    const image = loadPotionImage(potion.id);
 
-    document.getElementById('modalImage').src = image || '';
-    document.getElementById('modalImage').style.display = image ? 'block' : 'none';
+    document.getElementById('modalImage').src = potion.image || '';
+    document.getElementById('modalImage').style.display = potion.image ? 'block' : 'none';
     document.getElementById('modalName').textContent = potion.name;
     document.getElementById('modalDescription').textContent = potion.description || '';
 
@@ -200,6 +240,9 @@ function openModal(potion) {
     ingList.innerHTML = potion.ingredients ? potion.ingredients.map(i => `<li>${i}</li>`).join('') : '';
 
     document.getElementById('modalAdditional').textContent = potion.additionalDescription || '';
+
+    const habitatList = document.getElementById('modalHabitat');
+    habitatList.innerHTML = potion.habitat ? potion.habitat.map(h => `<li>${h}</li>`).join('') : '';
 
     document.getElementById('editPotionBtn').onclick = () => {
         closeModal();
@@ -242,6 +285,8 @@ document.addEventListener('click', (e) => {
     const propDropdown = document.getElementById('propertyMultiselect');
     const tagToggle = document.getElementById('tagToggle');
     const tagDropdown = document.getElementById('tagMultiselect');
+    const habitatToggle = document.getElementById('habitatToggle');
+    const habitatDropdown = document.getElementById('habitatMultiselect');
 
     if (propToggle && !propDropdown.contains(e.target)) {
         propDropdown.classList.remove('open');
@@ -249,13 +294,18 @@ document.addEventListener('click', (e) => {
     if (tagToggle && !tagDropdown.contains(e.target)) {
         tagDropdown.classList.remove('open');
     }
+    if (habitatToggle && !habitatDropdown.contains(e.target)) {
+        habitatDropdown.classList.remove('open');
+    }
 });
 
 if (document.getElementById('propertyToggle')) {
     document.getElementById('propertyToggle').addEventListener('click', () => {
         const dropdown = document.getElementById('propertyMultiselect');
         const tagDropdown = document.getElementById('tagMultiselect');
+        const habitatDropdown = document.getElementById('habitatMultiselect');
         tagDropdown.classList.remove('open');
+        habitatDropdown.classList.remove('open');
         dropdown.classList.toggle('open');
     });
 
@@ -277,7 +327,9 @@ if (document.getElementById('tagToggle')) {
     document.getElementById('tagToggle').addEventListener('click', () => {
         const dropdown = document.getElementById('tagMultiselect');
         const propDropdown = document.getElementById('propertyMultiselect');
+        const habitatDropdown = document.getElementById('habitatMultiselect');
         propDropdown.classList.remove('open');
+        habitatDropdown.classList.remove('open');
         dropdown.classList.toggle('open');
     });
 
@@ -295,6 +347,30 @@ if (document.getElementById('tagToggle')) {
     });
 }
 
+if (document.getElementById('habitatToggle')) {
+    document.getElementById('habitatToggle').addEventListener('click', () => {
+        const dropdown = document.getElementById('habitatMultiselect');
+        const propDropdown = document.getElementById('propertyMultiselect');
+        const tagDropdown = document.getElementById('tagMultiselect');
+        propDropdown.classList.remove('open');
+        tagDropdown.classList.remove('open');
+        dropdown.classList.toggle('open');
+    });
+
+    document.getElementById('habitatDropdown').addEventListener('change', (e) => {
+        if (e.target.type === 'checkbox') {
+            const value = e.target.value;
+            if (e.target.checked) {
+                selectedHabitats.push(value);
+            } else {
+                selectedHabitats = selectedHabitats.filter(h => h !== value);
+            }
+            updateHabitatLabel();
+            filterPotions();
+        }
+    });
+}
+
 window.addEventListener('storage', () => {
     loadPotions();
 });
@@ -304,10 +380,6 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
                 console.log('SW registered:', registration.scope);
-
-                setInterval(() => {
-                    registration.update();
-                }, 60000);
 
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;

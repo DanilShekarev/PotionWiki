@@ -45,6 +45,16 @@
                     <div class="multiselect-dropdown" id="tagDropdown"></div>
                 </div>
             </div>
+            <div class="filter-group">
+                <label>Обитание</label>
+                <div class="multiselect" id="habitatMultiselect">
+                    <button type="button" class="multiselect-toggle" id="habitatToggle">
+                        <span id="habitatLabel">Все обитания</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="multiselect-dropdown" id="habitatDropdown"></div>
+                </div>
+            </div>
         </section>
 
         <section id="potionsList" class="potions-grid">
@@ -70,6 +80,10 @@
                     <div class="modal-section">
                         <h3>Состав</h3>
                         <ul id="modalIngredients"></ul>
+                    </div>
+                    <div class="modal-section">
+                        <h3>Обитание</h3>
+                        <ul id="modalHabitat"></ul>
                     </div>
                     <div class="modal-section">
                         <h3>Дополнительно</h3>

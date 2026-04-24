@@ -1,4 +1,4 @@
-const CACHE_NAME = 'potionwiki-v5';
+const CACHE_NAME = 'potionwiki-v9';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -34,21 +34,29 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-
-  const url = event.request.url;
-
   event.respondWith(
-    caches.match(url).then((response) => {
+    caches.match(event.request).then((response) => {
       if (response) {
         return response;
       }
 
+      return fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+          });
+        }
+        return networkResponse;
+      });
+    }).catch(() => {
+      const url = event.request.url;
       if (url.includes('editor')) {
         return caches.match('/editor.html');
       }
-
-      return caches.match('/index.html');
+      if (url.includes('index') || url.endsWith('/')) {
+        return caches.match('/index.html');
+      }
+      return new Response('', { status: 503 });
     })
   );
 });

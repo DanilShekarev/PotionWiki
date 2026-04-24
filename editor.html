@@ -21,9 +21,10 @@
         <section class="editor-actions">
             <div class="file-actions">
                 <button id="savePotionBtn" class="btn btn-primary">Сохранить зелье</button>
-                <button id="downloadJsonBtn" class="btn btn-secondary">Скачать JSON</button>
-                <button id="loadJsonBtn" class="btn btn-secondary">Загрузить JSON</button>
-                <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+                <button id="exportAllBtn" class="btn btn-secondary">Экспорт всех данных</button>
+                <button id="importAllBtn" class="btn btn-secondary">Импорт данных</button>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                <button id="deleteAllBtn" class="btn btn-secondary" style="background:#e74c3c;color:white;border:1px solid #c0392b;">Удалить все данные</button>
             </div>
             <div class="potion-list-section">
                 <label>или выберите существующее:</label>
@@ -50,20 +51,18 @@
             </div>
 
             <div class="form-group">
-                <label>Изображение (PNG, JPG, WebP)</label>
-                <div class="image-upload-area" id="imageUploadArea">
-                    <div class="image-upload-placeholder" id="imagePlaceholder">
-                        <span>Нажмите или перетащите изображение</span>
-                    </div>
-                    <img id="imagePreview" src="" alt="Превью" style="display: none;">
-                </div>
-                <input type="file" id="potionImageInput" accept="image/png,image/jpeg,image/webp" style="display: none;">
-                <button type="button" id="removeImageBtn" class="btn btn-secondary" style="margin-top: 0.5rem; display: none;">Удалить изображение</button>
+                <label for="potionImage">Ссылка на изображение</label>
+                <input type="url" id="potionImage" placeholder="https://example.com/image.png">
             </div>
 
             <div class="form-group">
                 <label>Теги (через запятую)</label>
                 <input type="text" id="potionTags" placeholder="лечебное, редкое, магическое">
+            </div>
+
+            <div class="form-group">
+                <label>Обитание (через запятую)</label>
+                <input type="text" id="potionHabitat" placeholder="подземелье, лес, город">
             </div>
 
             <div class="form-group">
