@@ -7,7 +7,7 @@ const DEFAULT_POTIONS = [
     image: "",
     tags: ["лечебное", "базовое", "обычное"],
     properties: ["Восстанавливает 2d4+2 HP", "Не требует проверки"],
-    composition: ["@Целебная трава", "@Очищенная вода", "Капля эликсира"]
+    composition: ["@Целебная трава (3 шт)", "@Очищенная вода", "Капля эликсира"]
   },
   {
     id: "zelie-nevidimosti",
@@ -221,15 +221,20 @@ function renderComposition(composition) {
     return composition.map(item => {
         if (item.startsWith('@')) {
             const name = item.slice(1);
+            const extraMatch = name.match(/^(.+?)\s*\((.+)\)$/);
+            const cleanName = extraMatch ? extraMatch[1].trim() : name;
+            const extra = extraMatch ? extraMatch[2].trim() : '';
+
             const ingredients = JSON.parse(localStorage.getItem('potionwiki_ingredients') || '[]');
             const all = JSON.parse(localStorage.getItem('potionwiki_potions') || '[]').concat(ingredients);
-            const found = all.find(i => i.name === name);
+            const found = all.find(i => i.name === cleanName);
             if (found) {
                 const isIngredient = ingredients.some(i => i.id === found.id);
                 const page = isIngredient ? 'ingredients.html' : 'index.html';
-                return `<li><a href="${page}?name=${encodeURIComponent(name)}" class="composition-link">${name}</a></li>`;
+                const extraHtml = extra ? ` <span class="composition-extra">${extra}</span>` : '';
+                return `<li><a href="${page}?name=${encodeURIComponent(cleanName)}" class="composition-link">${cleanName}</a>${extraHtml}</li>`;
             }
-            return `<li><span class="composition-link missing">${name}</span></li>`;
+            return `<li><span class="composition-link missing">${cleanName}</span>${extra ? ` <span class="composition-extra">${extra}</span>` : ''}</li>`;
         }
         return `<li>${item}</li>`;
     }).join('');

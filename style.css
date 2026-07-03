@@ -384,6 +384,12 @@ main {
     font-style: italic;
 }
 
+.composition-extra {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-left: 0.25rem;
+}
+
 .no-results {
     text-align: center;
     color: var(--text-light);

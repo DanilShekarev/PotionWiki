@@ -346,11 +346,9 @@ function insertAutocompleteItem(name) {
     }
 
     const before = text.slice(0, atIndex);
-    const lineEnd = beforeCursor.includes('\n') ? beforeCursor.lastIndexOf('\n') + 1 : 0;
-    const prefix = beforeCursor.slice(lineEnd);
 
-    textarea.value = before + '@' + name + '\n' + afterCursor;
-    textarea.selectionStart = textarea.selectionEnd = (before + '@' + name + '\n').length;
+    textarea.value = before + '@' + name + ' ()' + afterCursor;
+    textarea.selectionStart = textarea.selectionEnd = (before + '@' + name + ' (').length;
 
     hideAutocomplete();
     textarea.focus();
