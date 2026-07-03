@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Редактор зелий - PotionWiki</title>
+    <title>Редактор - PotionWiki</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="editor.css">
 </head>
@@ -12,24 +12,32 @@
         <h1>PotionWiki</h1>
         <nav>
             <a href="index.html">Зелья</a>
+            <a href="ingredients.html">Ингредиенты</a>
             <a href="editor.html" class="active">Редактор</a>
         </nav>
     </header>
-    <a href="index.html" class="back-link">← К зельям</a>
+    <a href="index.html" class="back-link">← Назад</a>
 
     <main>
         <section class="editor-actions">
             <div class="file-actions">
-                <button id="savePotionBtn" class="btn btn-primary">Сохранить зелье</button>
+                <button id="savePotionBtn" class="btn btn-primary">Сохранить</button>
                 <button id="exportAllBtn" class="btn btn-secondary">Экспорт всех данных</button>
                 <button id="importAllBtn" class="btn btn-secondary">Импорт данных</button>
                 <input type="file" id="importFileInput" accept=".json" style="display: none;">
                 <button id="deleteAllBtn" class="btn btn-secondary" style="background:#e74c3c;color:white;border:1px solid #c0392b;">Удалить все данные</button>
             </div>
+            <div class="type-selector">
+                <label>Тип:</label>
+                <div class="type-buttons">
+                    <button type="button" class="type-btn active" id="typePotion" data-type="potion">🧪 Зелье</button>
+                    <button type="button" class="type-btn" id="typeIngredient" data-type="ingredient">🌿 Ингредиент</button>
+                </div>
+            </div>
             <div class="potion-list-section">
                 <label>или выберите существующее:</label>
                 <select id="existingPotions">
-                    <option value="">-- Новое зелье --</option>
+                    <option value="">-- Новое --</option>
                 </select>
             </div>
         </section>
@@ -37,7 +45,7 @@
         <section class="editor-form">
             <div class="form-group">
                 <label for="potionName">Название</label>
-                <input type="text" id="potionName" placeholder="Название зелья">
+                <input type="text" id="potionName" placeholder="Название">
             </div>
 
             <div class="form-group">
@@ -60,10 +68,7 @@
                 <input type="text" id="potionTags" placeholder="лечебное, редкое, магическое">
             </div>
 
-            <div class="form-group">
-                <label>Обитание (через запятую)</label>
-                <input type="text" id="potionHabitat" placeholder="подземелье, лес, город">
-            </div>
+
 
             <div class="form-group">
                 <label>Свойства (по одному на строку)</label>
@@ -71,12 +76,15 @@
             </div>
 
             <div class="form-group">
-                <label>Состав (по одному на строку)</label>
-                <textarea id="potionIngredients" rows="4" placeholder="Целебная трава&#10;Очищенная вода"></textarea>
+                <label>Состав (по одному на строку, используйте @Имя для ссылок)</label>
+                <div class="composition-input-wrapper">
+                    <textarea id="potionComposition" rows="4" placeholder="@Целебная трава&#10;Очищенная вода"></textarea>
+                    <div id="compositionAutocomplete" class="autocomplete-dropdown"></div>
+                </div>
             </div>
 
             <div class="form-actions">
-                <button id="deletePotionBtn" class="btn btn-secondary" style="background:#e74c3c;color:white;border:none;">Удалить зелье</button>
+                <button id="deletePotionBtn" class="btn btn-secondary" style="background:#e74c3c;color:white;border:none;">Удалить</button>
                 <button id="clearBtn" class="btn btn-secondary">Очистить</button>
             </div>
         </section>

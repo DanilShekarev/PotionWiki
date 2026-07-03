@@ -123,6 +123,77 @@
     background: var(--bg);
 }
 
+.type-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.type-selector label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.type-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.type-btn {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-card);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.type-btn:hover {
+    border-color: var(--accent);
+}
+
+.type-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.composition-input-wrapper {
+    position: relative;
+}
+
+.autocomplete-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 200;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.autocomplete-item {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.focused {
+    background: var(--bg);
+}
+
 @media (min-width: 480px) {
     .editor-actions {
         flex-direction: row;

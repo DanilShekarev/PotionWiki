@@ -6,9 +6,8 @@ const DEFAULT_POTIONS = [
     additionalDescription: "Имеет приятный розовый цвет и сладковатый вкус. Популярно среди искателей приключений любого уровня.",
     image: "",
     tags: ["лечебное", "базовое", "обычное"],
-    habitat: ["город", "подземелье"],
     properties: ["Восстанавливает 2d4+2 HP", "Не требует проверки"],
-    ingredients: ["Целебная трава", "Очищенная вода", "Капля эликсира"]
+    composition: ["@Целебная трава", "@Очищенная вода", "Капля эликсира"]
   },
   {
     id: "zelie-nevidimosti",
@@ -17,9 +16,8 @@ const DEFAULT_POTIONS = [
     additionalDescription: "Прозрачная жидкость с лёгким мерцанием. Эффект исчезает сразу после атаки или использования заклинания.",
     image: "",
     tags: ["магическое", "редкое"],
-    habitat: ["подземелье"],
     properties: ["Невидимость 1d4+4 часа", "Исчезает после атаки", "Скрывает от обнаружения"],
-    ingredients: ["Слеза призрака", "Эфирное крыло", "Аманитовый гриб"]
+    composition: ["@Слеза призрака", "@Эфирное крыло", "@Аманитовый гриб"]
   },
   {
     id: "zelie-velikoy-sili",
@@ -28,19 +26,16 @@ const DEFAULT_POTIONS = [
     additionalDescription: "Ярко-красная густая жидкость. Придаёт ощущение невероятной мощи, но быстрое истощение мышц может быть опасным.",
     image: "",
     tags: ["усиление", "редкое", "магическое"],
-    habitat: ["город", "лес"],
     properties: ["+5 к проверкам Силы", "Может сломать оружие при критической силе", "Длится 1 час"],
-    ingredients: ["Сок титана", "Кость великана", "Железный корень"]
+    composition: ["@Сок титана", "@Кость великана", "@Железный корень"]
   }
 ];
 
 let allPotions = [];
 let allProperties = new Set();
 let allTags = new Set();
-let allHabitats = new Set();
 let selectedProperties = [];
 let selectedTags = [];
-let selectedHabitats = [];
 
 async function loadPotions() {
     try {
@@ -53,11 +48,18 @@ async function loadPotions() {
         }
         extractProperties();
         extractTags();
-        extractHabitats();
         renderPotions(allPotions);
         populatePropertyDropdown();
         populateTagDropdown();
-        populateHabitatDropdown();
+
+        const params = new URLSearchParams(window.location.search);
+        const potionName = params.get('name');
+        if (potionName) {
+            const found = allPotions.find(p => p.name === potionName);
+            if (found) {
+                openModal(found);
+            }
+        }
     } catch (error) {
         console.error('Error loading potions:', error);
         document.getElementById('potionsList').innerHTML = '<p>Ошибка загрузки зелий</p>';
@@ -78,15 +80,6 @@ function extractTags() {
     allPotions.forEach(potion => {
         if (potion.tags) {
             potion.tags.forEach(tag => allTags.add(tag));
-        }
-    });
-}
-
-function extractHabitats() {
-    allHabitats.clear();
-    allPotions.forEach(potion => {
-        if (potion.habitat) {
-            potion.habitat.forEach(h => allHabitats.add(h));
         }
     });
 }
@@ -117,19 +110,6 @@ function populateTagDropdown() {
     updateTagLabel();
 }
 
-function populateHabitatDropdown() {
-    const dropdown = document.getElementById('habitatDropdown');
-    const options = Array.from(allHabitats).sort();
-    dropdown.innerHTML = options.map(habitat => `
-        <label class="multiselect-option">
-            <input type="checkbox" value="${habitat}" ${selectedHabitats.includes(habitat) ? 'checked' : ''}>
-            ${habitat}
-        </label>
-    `).join('');
-
-    updateHabitatLabel();
-}
-
 function updatePropertyLabel() {
     const label = document.getElementById('propertyLabel');
     if (selectedProperties.length === 0) {
@@ -149,17 +129,6 @@ function updateTagLabel() {
         label.textContent = selectedTags[0];
     } else {
         label.textContent = `Выбрано: ${selectedTags.length}`;
-    }
-}
-
-function updateHabitatLabel() {
-    const label = document.getElementById('habitatLabel');
-    if (selectedHabitats.length === 0) {
-        label.textContent = 'Все обитания';
-    } else if (selectedHabitats.length === 1) {
-        label.textContent = selectedHabitats[0];
-    } else {
-        label.textContent = `Выбрано: ${selectedHabitats.length}`;
     }
 }
 
@@ -213,12 +182,6 @@ function filterPotions() {
         );
     }
 
-    if (selectedHabitats.length > 0) {
-        filtered = filtered.filter(potion =>
-            potion.habitat && selectedHabitats.some(h => potion.habitat.includes(h))
-        );
-    }
-
     renderPotions(filtered);
 }
 
@@ -236,13 +199,10 @@ function openModal(potion) {
     const propsList = document.getElementById('modalProperties');
     propsList.innerHTML = potion.properties ? potion.properties.map(p => `<li>${p}</li>`).join('') : '';
 
-    const ingList = document.getElementById('modalIngredients');
-    ingList.innerHTML = potion.ingredients ? potion.ingredients.map(i => `<li>${i}</li>`).join('') : '';
+    const compList = document.getElementById('modalComposition');
+    compList.innerHTML = potion.composition ? renderComposition(potion.composition) : '';
 
     document.getElementById('modalAdditional').textContent = potion.additionalDescription || '';
-
-    const habitatList = document.getElementById('modalHabitat');
-    habitatList.innerHTML = potion.habitat ? potion.habitat.map(h => `<li>${h}</li>`).join('') : '';
 
     document.getElementById('editPotionBtn').onclick = () => {
         closeModal();
@@ -255,6 +215,24 @@ function openModal(potion) {
 
 function closeModal() {
     document.getElementById('potionModal').style.display = 'none';
+}
+
+function renderComposition(composition) {
+    return composition.map(item => {
+        if (item.startsWith('@')) {
+            const name = item.slice(1);
+            const ingredients = JSON.parse(localStorage.getItem('potionwiki_ingredients') || '[]');
+            const all = JSON.parse(localStorage.getItem('potionwiki_potions') || '[]').concat(ingredients);
+            const found = all.find(i => i.name === name);
+            if (found) {
+                const isIngredient = ingredients.some(i => i.id === found.id);
+                const page = isIngredient ? 'ingredients.html' : 'index.html';
+                return `<li><a href="${page}?name=${encodeURIComponent(name)}" class="composition-link">${name}</a></li>`;
+            }
+            return `<li><span class="composition-link missing">${name}</span></li>`;
+        }
+        return `<li>${item}</li>`;
+    }).join('');
 }
 
 if (document.getElementById('search')) {
@@ -285,8 +263,6 @@ document.addEventListener('click', (e) => {
     const propDropdown = document.getElementById('propertyMultiselect');
     const tagToggle = document.getElementById('tagToggle');
     const tagDropdown = document.getElementById('tagMultiselect');
-    const habitatToggle = document.getElementById('habitatToggle');
-    const habitatDropdown = document.getElementById('habitatMultiselect');
 
     if (propToggle && !propDropdown.contains(e.target)) {
         propDropdown.classList.remove('open');
@@ -294,18 +270,13 @@ document.addEventListener('click', (e) => {
     if (tagToggle && !tagDropdown.contains(e.target)) {
         tagDropdown.classList.remove('open');
     }
-    if (habitatToggle && !habitatDropdown.contains(e.target)) {
-        habitatDropdown.classList.remove('open');
-    }
 });
 
 if (document.getElementById('propertyToggle')) {
     document.getElementById('propertyToggle').addEventListener('click', () => {
         const dropdown = document.getElementById('propertyMultiselect');
         const tagDropdown = document.getElementById('tagMultiselect');
-        const habitatDropdown = document.getElementById('habitatMultiselect');
         tagDropdown.classList.remove('open');
-        habitatDropdown.classList.remove('open');
         dropdown.classList.toggle('open');
     });
 
@@ -327,9 +298,7 @@ if (document.getElementById('tagToggle')) {
     document.getElementById('tagToggle').addEventListener('click', () => {
         const dropdown = document.getElementById('tagMultiselect');
         const propDropdown = document.getElementById('propertyMultiselect');
-        const habitatDropdown = document.getElementById('habitatMultiselect');
         propDropdown.classList.remove('open');
-        habitatDropdown.classList.remove('open');
         dropdown.classList.toggle('open');
     });
 
@@ -342,30 +311,6 @@ if (document.getElementById('tagToggle')) {
                 selectedTags = selectedTags.filter(t => t !== value);
             }
             updateTagLabel();
-            filterPotions();
-        }
-    });
-}
-
-if (document.getElementById('habitatToggle')) {
-    document.getElementById('habitatToggle').addEventListener('click', () => {
-        const dropdown = document.getElementById('habitatMultiselect');
-        const propDropdown = document.getElementById('propertyMultiselect');
-        const tagDropdown = document.getElementById('tagMultiselect');
-        propDropdown.classList.remove('open');
-        tagDropdown.classList.remove('open');
-        dropdown.classList.toggle('open');
-    });
-
-    document.getElementById('habitatDropdown').addEventListener('change', (e) => {
-        if (e.target.type === 'checkbox') {
-            const value = e.target.value;
-            if (e.target.checked) {
-                selectedHabitats.push(value);
-            } else {
-                selectedHabitats = selectedHabitats.filter(h => h !== value);
-            }
-            updateHabitatLabel();
             filterPotions();
         }
     });

@@ -369,6 +369,21 @@ main {
     color: var(--accent);
 }
 
+.composition-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.composition-link:hover {
+    text-decoration: underline;
+}
+
+.composition-link.missing {
+    color: var(--text-light);
+    font-style: italic;
+}
+
 .no-results {
     text-align: center;
     color: var(--text-light);

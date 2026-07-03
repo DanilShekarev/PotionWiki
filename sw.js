@@ -1,4 +1,4 @@
-const CACHE_NAME = 'potionwiki-v9';
+const CACHE_NAME = 'potionwiki-v10';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -6,8 +6,10 @@ self.addEventListener('install', (event) => {
       return cache.addAll([
         '/',
         '/index.html',
+        '/ingredients.html',
         '/editor.html',
         '/app.js',
+        '/ingredients.js',
         '/editor.js',
         '/style.css',
         '/editor.css',
@@ -52,6 +54,9 @@ self.addEventListener('fetch', (event) => {
       const url = event.request.url;
       if (url.includes('editor')) {
         return caches.match('/editor.html');
+      }
+      if (url.includes('ingredients')) {
+        return caches.match('/ingredients.html');
       }
       if (url.includes('index') || url.endsWith('/')) {
         return caches.match('/index.html');
