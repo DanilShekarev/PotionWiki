@@ -1,4 +1,4 @@
-const CACHE_NAME = 'potionwiki-v10';
+const CACHE_NAME = 'potionwiki-v11';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -11,6 +11,7 @@ self.addEventListener('install', (event) => {
         '/app.js',
         '/ingredients.js',
         '/editor.js',
+        '/data.json',
         '/style.css',
         '/editor.css',
         '/manifest.json',

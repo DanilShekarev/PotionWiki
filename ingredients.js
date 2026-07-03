@@ -5,6 +5,19 @@ let allHabitats = new Set();
 let selectedProperties = [];
 let selectedTags = [];
 let selectedHabitats = [];
+let defaultData = null;
+
+async function loadDefaultData() {
+    if (defaultData) return defaultData;
+    try {
+        const resp = await fetch('data.json');
+        if (resp.ok) {
+            defaultData = await resp.json();
+            return defaultData;
+        }
+    } catch (e) {}
+    return null;
+}
 
 async function loadIngredients() {
     try {
@@ -12,7 +25,9 @@ async function loadIngredients() {
         if (stored) {
             allIngredients = JSON.parse(stored);
         } else {
-            allIngredients = [];
+            const data = await loadDefaultData();
+            allIngredients = (data && data.ingredients) ? data.ingredients : [];
+            localStorage.setItem('potionwiki_ingredients', JSON.stringify(allIngredients));
         }
         extractProperties();
         extractTags();

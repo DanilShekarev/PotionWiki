@@ -36,6 +36,19 @@ let allProperties = new Set();
 let allTags = new Set();
 let selectedProperties = [];
 let selectedTags = [];
+let defaultData = null;
+
+async function loadDefaultData() {
+    if (defaultData) return defaultData;
+    try {
+        const resp = await fetch('data.json');
+        if (resp.ok) {
+            defaultData = await resp.json();
+            return defaultData;
+        }
+    } catch (e) {}
+    return null;
+}
 
 async function loadPotions() {
     try {
@@ -43,8 +56,9 @@ async function loadPotions() {
         if (stored) {
             allPotions = JSON.parse(stored);
         } else {
-            allPotions = DEFAULT_POTIONS;
-            localStorage.setItem('potionwiki_potions', JSON.stringify(DEFAULT_POTIONS));
+            const data = await loadDefaultData();
+            allPotions = (data && data.potions) ? data.potions : DEFAULT_POTIONS;
+            localStorage.setItem('potionwiki_potions', JSON.stringify(allPotions));
         }
         extractProperties();
         extractTags();
