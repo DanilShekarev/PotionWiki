@@ -1,8 +1,10 @@
 let allIngredients = [];
 let allProperties = new Set();
 let allTags = new Set();
+let allHabitats = new Set();
 let selectedProperties = [];
 let selectedTags = [];
+let selectedHabitats = [];
 
 async function loadIngredients() {
     try {
@@ -14,9 +16,11 @@ async function loadIngredients() {
         }
         extractProperties();
         extractTags();
+        extractHabitats();
         renderIngredients(allIngredients);
         populatePropertyDropdown();
         populateTagDropdown();
+        populateHabitatDropdown();
 
         const params = new URLSearchParams(window.location.search);
         const ingredientName = params.get('name');
@@ -50,6 +54,15 @@ function extractTags() {
     });
 }
 
+function extractHabitats() {
+    allHabitats.clear();
+    allIngredients.forEach(item => {
+        if (item.habitat) {
+            item.habitat.forEach(h => allHabitats.add(h));
+        }
+    });
+}
+
 function populatePropertyDropdown() {
     const dropdown = document.getElementById('propertyDropdown');
     const options = Array.from(allProperties).sort();
@@ -76,6 +89,19 @@ function populateTagDropdown() {
     updateTagLabel();
 }
 
+function populateHabitatDropdown() {
+    const dropdown = document.getElementById('habitatDropdown');
+    const options = Array.from(allHabitats).sort();
+    dropdown.innerHTML = options.map(habitat => `
+        <label class="multiselect-option">
+            <input type="checkbox" value="${habitat}" ${selectedHabitats.includes(habitat) ? 'checked' : ''}>
+            ${habitat}
+        </label>
+    `).join('');
+
+    updateHabitatLabel();
+}
+
 function updatePropertyLabel() {
     const label = document.getElementById('propertyLabel');
     if (selectedProperties.length === 0) {
@@ -95,6 +121,17 @@ function updateTagLabel() {
         label.textContent = selectedTags[0];
     } else {
         label.textContent = `Выбрано: ${selectedTags.length}`;
+    }
+}
+
+function updateHabitatLabel() {
+    const label = document.getElementById('habitatLabel');
+    if (selectedHabitats.length === 0) {
+        label.textContent = 'Все обитания';
+    } else if (selectedHabitats.length === 1) {
+        label.textContent = selectedHabitats[0];
+    } else {
+        label.textContent = `Выбрано: ${selectedHabitats.length}`;
     }
 }
 
@@ -148,6 +185,12 @@ function filterIngredients() {
         );
     }
 
+    if (selectedHabitats.length > 0) {
+        filtered = filtered.filter(item =>
+            item.habitat && selectedHabitats.some(h => item.habitat.includes(h))
+        );
+    }
+
     renderIngredients(filtered);
 }
 
@@ -188,6 +231,9 @@ function openModal(item) {
     compList.innerHTML = item.composition ? renderComposition(item.composition) : '';
 
     document.getElementById('modalAdditional').textContent = item.additionalDescription || '';
+
+    const habitatList = document.getElementById('modalHabitat');
+    habitatList.innerHTML = item.habitat ? item.habitat.map(h => `<li>${h}</li>`).join('') : '';
 
     document.getElementById('editPotionBtn').onclick = () => {
         closeModal();
@@ -230,6 +276,8 @@ document.addEventListener('click', (e) => {
     const propDropdown = document.getElementById('propertyMultiselect');
     const tagToggle = document.getElementById('tagToggle');
     const tagDropdown = document.getElementById('tagMultiselect');
+    const habitatToggle = document.getElementById('habitatToggle');
+    const habitatDropdown = document.getElementById('habitatMultiselect');
 
     if (propToggle && !propDropdown.contains(e.target)) {
         propDropdown.classList.remove('open');
@@ -237,13 +285,18 @@ document.addEventListener('click', (e) => {
     if (tagToggle && !tagDropdown.contains(e.target)) {
         tagDropdown.classList.remove('open');
     }
+    if (habitatToggle && !habitatDropdown.contains(e.target)) {
+        habitatDropdown.classList.remove('open');
+    }
 });
 
 if (document.getElementById('propertyToggle')) {
     document.getElementById('propertyToggle').addEventListener('click', () => {
         const dropdown = document.getElementById('propertyMultiselect');
         const tagDropdown = document.getElementById('tagMultiselect');
+        const habitatDropdown = document.getElementById('habitatMultiselect');
         tagDropdown.classList.remove('open');
+        habitatDropdown.classList.remove('open');
         dropdown.classList.toggle('open');
     });
 
@@ -265,7 +318,9 @@ if (document.getElementById('tagToggle')) {
     document.getElementById('tagToggle').addEventListener('click', () => {
         const dropdown = document.getElementById('tagMultiselect');
         const propDropdown = document.getElementById('propertyMultiselect');
+        const habitatDropdown = document.getElementById('habitatMultiselect');
         propDropdown.classList.remove('open');
+        habitatDropdown.classList.remove('open');
         dropdown.classList.toggle('open');
     });
 
@@ -278,6 +333,30 @@ if (document.getElementById('tagToggle')) {
                 selectedTags = selectedTags.filter(t => t !== value);
             }
             updateTagLabel();
+            filterIngredients();
+        }
+    });
+}
+
+if (document.getElementById('habitatToggle')) {
+    document.getElementById('habitatToggle').addEventListener('click', () => {
+        const dropdown = document.getElementById('habitatMultiselect');
+        const propDropdown = document.getElementById('propertyMultiselect');
+        const tagDropdown = document.getElementById('tagMultiselect');
+        propDropdown.classList.remove('open');
+        tagDropdown.classList.remove('open');
+        dropdown.classList.toggle('open');
+    });
+
+    document.getElementById('habitatDropdown').addEventListener('change', (e) => {
+        if (e.target.type === 'checkbox') {
+            const value = e.target.value;
+            if (e.target.checked) {
+                selectedHabitats.push(value);
+            } else {
+                selectedHabitats = selectedHabitats.filter(h => h !== value);
+            }
+            updateHabitatLabel();
             filterIngredients();
         }
     });

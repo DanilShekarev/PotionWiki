@@ -67,9 +67,9 @@ function setType(type) {
         btn.classList.toggle('active', btn.dataset.type === type);
     });
 
-    const title = document.getElementById('formTitle');
-    if (title) {
-        title.textContent = type === 'potion' ? 'Редактор зелья' : 'Редактор ингредиента';
+    const habitatGroup = document.getElementById('habitatGroup');
+    if (habitatGroup) {
+        habitatGroup.style.display = type === 'ingredient' ? 'block' : 'none';
     }
 
     clearForm();
@@ -93,6 +93,10 @@ function fillForm(item) {
     document.getElementById('potionTags').value = item.tags ? item.tags.join(', ') : '';
     document.getElementById('potionProperties').value = item.properties ? item.properties.join('\n') : '';
     document.getElementById('potionComposition').value = item.composition ? item.composition.join('\n') : '';
+    const habitatInput = document.getElementById('potionHabitat');
+    if (habitatInput) {
+        habitatInput.value = item.habitat ? item.habitat.join(', ') : '';
+    }
     currentEditingId = item.id;
 }
 
@@ -100,8 +104,9 @@ function getFormData() {
     const tagsInput = document.getElementById('potionTags').value;
     const propertiesInput = document.getElementById('potionProperties').value;
     const compositionInput = document.getElementById('potionComposition').value;
+    const habitatInput = document.getElementById('potionHabitat') ? document.getElementById('potionHabitat').value : '';
 
-    return {
+    const data = {
         name: document.getElementById('potionName').value.trim(),
         description: document.getElementById('potionDescription').value.trim(),
         additionalDescription: document.getElementById('potionAdditional').value.trim(),
@@ -110,6 +115,12 @@ function getFormData() {
         properties: propertiesInput ? propertiesInput.split('\n').map(p => p.trim()).filter(p => p) : [],
         composition: compositionInput ? compositionInput.split('\n').map(c => c.trim()).filter(c => c) : []
     };
+
+    if (currentType === 'ingredient' && habitatInput) {
+        data.habitat = habitatInput.split(',').map(h => h.trim()).filter(h => h);
+    }
+
+    return data;
 }
 
 function saveItem() {
@@ -158,6 +169,8 @@ function clearForm() {
     document.getElementById('potionTags').value = '';
     document.getElementById('potionProperties').value = '';
     document.getElementById('potionComposition').value = '';
+    const habitatInput = document.getElementById('potionHabitat');
+    if (habitatInput) habitatInput.value = '';
     document.getElementById('existingPotions').value = '';
     currentEditingId = null;
     hideAutocomplete();
